@@ -13,36 +13,45 @@ class Node:
         self.prev_orders = []
         self.curr_orders = []
 
-        self.logs = []
+        self.logs = dict()
         self.conclusion = "RETREAT"
 
-    def send(self, target, order, round):
+    def send(self, target, order, round, step):
         msg = f"{self.id},{order}"
-        if self.is_traitor and round == 0:
+        if self.is_traitor and round == 1:
             msg = msg.replace(order[-1], "R" if order[-1] == "A" else "A")
 
-        self.write_log(f"Sending {msg} to Node {target.id}")
-        target.receive(msg)
+        self.write_log(f"Sending {msg} to Node {target.id}", round, step)
+        target.receive(msg, self.id, round, step)
 
     def cmd_send(self, target, order):
         msg = f"{self.id},{order}"
         if self.is_traitor:
             msg = msg.replace(order, "R" if random.choice([0,1]) == 0 else "A")
         
-        self.write_log(f"Sending {msg} to Node {target.id}")
-        target.receive(msg)
+        self.write_log(f"Sending {msg} to Node {target.id}", 0, 0)
+        target.receive(msg, self.id, 0, 0)
 
-    def receive(self, msg):
+    def receive(self, msg, sender, round, step):
         self.orders.append(msg)
         self.curr_orders.append(msg)
-        self.write_log(f"Received {msg}")
+
+        sender_node = "Commander" if sender == 0 else f"Node {sender}"
+        self.write_log(f"Received {msg} from {sender_node}", round, step)
 
     def flush_orders(self):
         self.prev_orders.extend(self.curr_orders)
         self.curr_orders = []
 
-    def write_log(self, msg):
-        self.logs.append(f"[Node {self.id}] {msg}")
+    def write_log(self, msg, round, step):
+        # self.logs.append(f"[Node {self.id}] {msg}")
+        if round not in self.logs:
+            self.logs[round] = dict()
+
+        if step not in self.logs[round]:
+            self.logs[round][step] = []
+
+        self.logs[round][step].append(msg)
 
     def to_json(self):
         return {
@@ -68,12 +77,12 @@ def om(is_traitor_status, initial_order):
     # Initial order from Commander
     commander = nodes[0]
     for node in nodes[1:]:
-        commander.send(node, initial_order, 0)
+        commander.cmd_send(node, initial_order)
         node.flush_orders()    
 
     # Do m rounds
     for round in range(m):
-        for sender in nodes[1:]:
+        for step, sender in enumerate(nodes[1:]):
 
             # Rebroadcast orders from previous round
             for order in sender.prev_orders:
@@ -83,7 +92,7 @@ def om(is_traitor_status, initial_order):
                     if target == sender or f"{target.id}" in order:
                         continue
 
-                    sender.send(target, order, round)
+                    sender.send(target, order, round+1, step+1)
         
         for node in nodes:
             node.flush_orders()
@@ -103,14 +112,14 @@ def om(is_traitor_status, initial_order):
             conclusion = "is a Byzantine Node"
         node.conclusion = conclusion
 
-        node.write_log(f"Received {attack} ATTACK and {retreat} RETREAT")
-        node.write_log(f"{conclusion}")
+        node.write_log(f"Received {attack} ATTACK and {retreat} RETREAT", "C", "C")
+        node.write_log(f"{conclusion}", "C", "C")
     
     if commander.is_traitor:
         commander.conclusion = "is a Byzantine Node"
     else:
         commander.conclusion = "ATTACK" if initial_order == "A" else "RETREAT"
-    commander.write_log(f"{commander.conclusion}")
+    commander.write_log(f"{commander.conclusion}", "C", "C")
 
     return nodes
 
@@ -144,8 +153,10 @@ def test(test_status=None, print_logs=False):
 
             if print_logs:
                 print(f"Node {node.id} | {node.conclusion}")
-                for log in node.logs:
-                    print(log)
+                for round in node.logs:
+                    for step in node.logs[round]:
+                        for log in node.logs[round][step]:
+                            print(log)
                 print("\n")
 
         consensus = "Not reached"
@@ -177,7 +188,8 @@ def serialized_om(is_traitor_status, initial_order):
 
 
 if __name__ == "__main__":
-    nodes = om([False, False, False, True], "A")
+    test_input = [False, False, False, True]
+    nodes = om(test_input, "A")
     
     serialized = serialize(nodes)
     print(serialized)

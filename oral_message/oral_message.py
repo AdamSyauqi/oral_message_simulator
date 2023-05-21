@@ -1,6 +1,6 @@
 import random
 import json
-
+import re
 
 class Node:
 
@@ -18,26 +18,34 @@ class Node:
 
     def send(self, target, order, round, step):
         msg = f"{self.id},{order}"
+
+        expended_order = "ATTACK" if order[-1] == "A" else "RETREAT"
+        
         if self.is_traitor and round == 1:
             msg = msg.replace(order[-1], "R" if order[-1] == "A" else "A")
+            expended_order = "RETREAT" if order[-1] == "A" else "ATTACK"
 
-        self.write_log(f"Sending {msg} to Node {target.id}", round, step)
-        target.receive(msg, self.id, round, step)
+        self.write_log(f"Sending {expended_order} to Node {target.id}", round, step)
+        target.receive(msg, self.id, round, step, expended_order)
 
     def cmd_send(self, target, order):
         msg = f"{self.id},{order}"
+
+        expended_order = "ATTACK" if order[-1] == "A" else "RETREAT"
+
         if self.is_traitor:
             msg = msg.replace(order, "R" if random.choice([0,1]) == 0 else "A")
+            expended_order = "RETREAT" if order[-1] == "A" else "ATTACK"
         
-        self.write_log(f"Sending {msg} to Node {target.id}", 0, 0)
-        target.receive(msg, self.id, 0, 0)
+        self.write_log(f"Sending {expended_order} to Node {target.id}", 0, 0)
+        target.receive(msg, self.id, 0, 0, expended_order)
 
-    def receive(self, msg, sender, round, step):
+    def receive(self, msg, sender, round, step, expended_order):
         self.orders.append(msg)
         self.curr_orders.append(msg)
 
         sender_node = "Commander" if sender == 0 else f"Node {sender}"
-        self.write_log(f"Received {msg} from {sender_node}", round, step)
+        self.write_log(f"Received {expended_order} from {sender_node}", round, step)
 
     def flush_orders(self):
         self.prev_orders.extend(self.curr_orders)

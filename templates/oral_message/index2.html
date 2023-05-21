@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -30,38 +31,11 @@
             
                         <!-- Byzantine Node Selection -->
                         <h6><span id="byz-warn" hidden style="color:red;font-weight: bold;">3m + 1 total node tidak terpenuhi, hasil konsensus TIDAK dijamin valid</span></h6>
-                        <div class="mt-4" style="height: 60%">
+                        <div class="mt-2" style="height: 60%">
                             <h5>Byznatine Node (<span id="byz-count">0</span>/<span id="node-count">4</span>)</h5>
 
                             <div class="container border border-3 border-dark py-1 px-3 overflow-y-scroll h-100">
                                 <div class="row row-cols-2 g-2" id="node-inp-container">
-                                    <!-- Byzantine Node S -->
-                                    <div class="col">
-                                        <div class="form-check-reverse text-start my-2 mx-2 py-2 ps-3 pe-5 border border-2 border-dark rounded">
-                                            <input class="form-check-input" type="checkbox" id="byz-node0" onchange="byz_node_check_handler(event)" value="">
-                                            <label class="form-check-label w-100" for="byz-node">Commander</label>
-                                        </div>
-                                    </div>
-                                    <!-- Byzantine Node E -->
-
-                                    <div class="col">
-                                        <div class="form-check-reverse text-start my-2 mx-2 py-2 ps-3 pe-5 border border-2 border-dark rounded">
-                                            <input class="form-check-input" type="checkbox" id="byz-node1" onchange="byz_node_check_handler(event)" value="">
-                                            <label class="form-check-label w-100" for="byz-node1">Node 1</label>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="form-check-reverse text-start my-2 mx-2 py-2 ps-3 pe-5 border border-2 border-dark rounded">
-                                            <input class="form-check-input" type="checkbox" id="byz-node2" onchange="byz_node_check_handler(event)" value="">
-                                            <label class="form-check-label w-100" for="byz-node2">Node 2</label>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="form-check-reverse text-start my-2 mx-2 py-2 ps-3 pe-5 border border-2 border-dark rounded">
-                                            <input class="form-check-input" type="checkbox" id="byz-node3" onchange="byz_node_check_handler(event)" value="">
-                                            <label class="form-check-label w-100" for="byz-node3">Node 3</label>
-                                        </div>
-                                    </div>
                                 </div>                             
                             </div>
                         </div>
@@ -73,7 +47,7 @@
                             <div class="row">
                                 <div class="col border border-3 border-dark me-5 py-2">
                                     <div class="form-check form-check-reverse text-start">
-                                        <input class="form-check-input" type="radio" name="action-radio" id="attack">
+                                        <input class="form-check-input" type="radio" name="action-radio" id="attack" checked>
                                         <label class="form-check-label fw-bold w-100" for="attack">
                                             Attack
                                         </label>
@@ -96,9 +70,9 @@
             
             
                         <!-- Button -->
-                        <div class="mt-4">
+                        <div class="mt-1">
                             <div class="d-flex justify-content-center">
-                                <button type="button" class="btn btn-dark btn-lg btn-block px-5">Start</button>
+                                <button type="button" class="btn btn-dark btn-lg btn-block px-5" id="start-btn">Start</button>
                             </div>
                         </div>  
             
@@ -111,109 +85,26 @@
                     <div class="card-body p-5 h-100">
                         <h4>Hasil Simulasi</h4>
                         
+                        <div class="d-flex justify-content-end gap-2">
+                            <div class="me-auto">
+                                <button type="button" class="btn btn-danger btn-md btn-block" id="reset-btn" disabled>Reset</button>
+                                <button type="button" class="btn btn-warning btn-md btn-block" id="skip-btn" disabled>Skip All</button>
+                            </div>
+                            <button type="button" class="btn btn-dark btn-md btn-block" id="prev-btn" disabled>Back</button>
+                            <button type="button" class="btn btn-primary btn-md btn-block" id="next-btn" disabled>Next</button>
+                        </div>
+                        
                         <div class="container py-1 px-3 overflow-y-scroll text-center text-light fw-bold" style="height: 85%">
                             
-                            <div class="row row-cols-2 g-2">
+                            <div class="row row-cols-2 g-2" id="result-container">
                                 <!-- Log Node S -->
-                                <div class="col">
-                                    <button class="btn btn-danger my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button" data-bs-toggle="modal" data-bs-target="#log0">
-                                        Commander | <span>Byzantine</span>
-                                    </button>
-                                </div>
                                 <!-- Log Node E -->
-
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-success my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Attack</span>
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn btn-primary my-2 mx-1 py-2 border border-3 border-dark rounded w-100 fw-bold" 
-                                        type="button">
-                                        Node 1 | <span>Retreat</span>
-                                    </button>
-                                </div>
                             </div>
 
-                            
                         </div>
 
-                        <div class="text-center mt-4">
-                            <h5>Konsensus <span>Tercapai</span></h3>
+                        <div class="text-center">
+                            <h5>Konsensus <span id="konsensus-status">Tercapai</span></h3>
                         </div>
                     </div>
                 </div>
@@ -222,7 +113,7 @@
     </div>
 
 
-    <!-- Modal -->
+    <!-- Log Modal -->
     <div class="modal fade" id="log0" tabindex="-1" aria-labelledby="log0Label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -231,28 +122,27 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <div class="modal-body" style="height: 450px; overflow-y: scroll;">
-                    <p>1. Receive Attack from Commander</p>
-                    <p>2. Send Attack to Node 1</p>
-                    <p>3. Send Attack to Node 2</p>
-                    <p>1. Receive Attack from Commander</p>
-                    <p>2. Send Attack to Node 1</p>
-                    <p>3. Send Attack to Node 2</p>
-                    <p>1. Receive Attack from Commander</p>
-                    <p>2. Send Attack to Node 1</p>
-                    <p>3. Send Attack to Node 2</p>
-                    <p>1. Receive Attack from Commander</p>
-                    <p>2. Send Attack to Node 1</p>
-                    <p>3. Send Attack to Node 2</p>
-                    <p>1. Receive Attack from Commander</p>
-                    <p>2. Send Attack to Node 1</p>
-                    <p>3. Send Attack to Node 2</p>
-                    <p>1. Receive Attack from Commander</p>
-                    <p>2. Send Attack to Node 1</p>
-                    <p>3. Send Attack to Node 2</p>
-                    <p>1. Receive Attack from Commander</p>
-                    <p>2. Send Attack to Node 1</p>
-                    <p>3. Send Attack to Node 2</p>
+                <div class="modal-body" id="log0content" style="height: 450px; overflow-y: scroll;">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="modal fade" id="warn_modal" tabindex="-1" aria-labelledby="warnLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="warnLabel">Warning</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="warncontent">
+                    Melebihi Batas Maksimum Total Node atau Byzantine Node (10).
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -263,65 +153,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
   </body>
-  <script>
-    let nodes = [0, 1, 2, 3]
-    let byz_nodes = []
-    $('#num-field').on('change', update_node)
-    $(window).on('load', function() {
-        let current_count = parseInt($('#num-field').val());
-        pop_node_until(current_count, 0);
-        update_node()
-        byz_nodes = []
-
-    })
-
-    function update_node() {
-        let current_count = parseInt($('#num-field').val());
-        if (current_count <= 0)
-            return
-        
-        if (current_count >= nodes.length) {
-            add_node_until(nodes.length, current_count);
-        }
-        else {
-            pop_node_until(nodes.length, current_count);
-        }
-        $('#node-count').text(`${nodes.length}`)
-    }
-
-    function add_node_until(start_node_id, target_num) {
-        for(let i = start_node_id; i < target_num; i++) {
-            let node_name = (i == 0) ? "Commander" : `Node ${i}`
-            $('#node-inp-container').append(`
-                <div class="col">
-                    <div class="form-check-reverse text-start my-2 mx-2 py-2 ps-3 pe-5 border border-2 border-dark rounded">
-                        <input class="form-check-input" type="checkbox" id="byz-node${i}" onchange="byz_node_check_handler(event)" value="">
-                        <label class="form-check-label w-100" for="byz-node${i}">${node_name}</label>
-                    </div>
-                </div>
-            `)
-            nodes.push(i);
-        }
-    }
-
-    function pop_node_until(start_node, target_node) {
-        for(let i = start_node; i > target_node; i--) {
-            $('#node-inp-container').children().last().remove()
-            nodes.pop()
-        }
-    }
-    function byz_node_check_handler(e) {
-        let nodeIdx = parseInt(e.target.id.substring('byz-node'.length))
-        if (e.target.checked) {
-            byz_nodes.push(nodeIdx)
-        } else {
-            let id_in_list = byz_nodes.indexOf(nodeIdx)
-            byz_nodes.splice(id_in_list, 1)
-        }
-        let is_show_warn = nodes.length < 3 * byz_nodes.length + 1
-        $('#byz-warn').attr('hidden', !is_show_warn)
-
-        $('#byz-count').text(`${byz_nodes.length}`)
-    }
-  </script>
+  <script type="text/javascript" src="{% static 'oral_message/js/oral_message.js' %}"></script>
 </html>

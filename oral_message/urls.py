@@ -4,6 +4,6 @@ from . import views
 app_name = "oral_message"
 
 urlpatterns = [
-    path('', views.index2),
+    path('', views.index, name='index'),
     path('api/om/', views.om_api, name='om_api')
 ]

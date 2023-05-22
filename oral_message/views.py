@@ -6,12 +6,8 @@ import json
 
 from .oral_message import serialized_om
 
-# Create your views here.
 def index(request):
     return render(request, 'oral_message/index.html')
-
-def index2(request):
-    return render(request, 'oral_message/index2.html')
 
 @csrf_exempt
 def om_api(request):

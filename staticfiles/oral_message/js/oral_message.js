@@ -56,7 +56,9 @@ function add_node_until(start_node_id, target_num) {
 function pop_node_until(start_node, target_node) {
     for(let i = start_node; i > target_node; i--) {
         $('#node-inp-container').children().last().remove()
-        node_statuses.pop()
+        if (node_statuses.pop()) {
+            byz_num--
+        }
     }
 }
 function byz_node_check_handler(e) {

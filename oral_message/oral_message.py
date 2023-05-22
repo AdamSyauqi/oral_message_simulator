@@ -184,9 +184,19 @@ def test(test_status=None, print_logs=False):
         print("\n==========================================\n")
 
 def serialize(nodes):
-    serialized = {}
+    serialized = {
+        "nodes": {}
+    }
+
+    counter = 0
     for node in nodes:
-        serialized[node.id] = node.to_json()
+        serialized["nodes"][node.id] = node.to_json()
+        if node.conclusion == "ATTACK":
+            counter += 1
+        elif node.conclusion == "RETREAT":
+            counter -= 1
+
+    serialized["conclusion"] = "Tercapai" if counter != 0 else "Tidak Tercapai"
     return json.dumps(serialized, indent=4)
 
 

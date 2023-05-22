@@ -120,9 +120,9 @@ $('#start-btn').on('click', function() {
             $('#skip-btn').prop('disabled', false)
             $('#next-btn').prop('disabled', false)
             $('#prev-btn').prop('disabled', false)
-            consensus_result = response
+            consensus_result = response["nodes"]
             determine_max_iter()
-            $('#konsensus-status').text('Tercapai')            
+            $('#konsensus-status').text(response["conclusion"])            
         }
     })
 

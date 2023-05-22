@@ -1,8 +1,5 @@
 let node_statuses = [false, false, false, false]
 let byz_num = 0;
-let total_rounds = 0;
-let cur_step = 0;
-let cur_round = 0;
 
 $('#num-field').on('change', update_node)
 
@@ -91,6 +88,9 @@ function update_warn_msg() {
 // result handler
 let consensus_result = []
 let max_step_per_rounds = []
+let total_rounds = 0;
+let cur_step = 0;
+let cur_round = 0;
 $('#start-btn').on('click', function() {
     $('#next-btn').prop('disabled', true)
     $('#prev-btn').prop('disabled', true)
@@ -98,6 +98,7 @@ $('#start-btn').on('click', function() {
     $('#reset-btn').prop('disabled', true)
     $('#konsensus-status').text('Sedang Berjalan')
     consensus_result = []
+    max_step_per_rounds = []
 
     total_rounds = node_statuses.reduce((a, b) => a + b, 2);
     cur_step = 0;
@@ -112,7 +113,7 @@ $('#start-btn').on('click', function() {
     $.ajax({
         type: 'POST',
         dataType: 'json',
-        url: "{% url 'om:om_api' %}",
+        url: "api/om/",
         data: JSON.stringify(data),
         success: function(response) {
             $('#reset-btn').prop('disabled', false)

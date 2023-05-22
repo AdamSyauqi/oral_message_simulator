@@ -18,13 +18,15 @@ $(window).on('load', function() {
 
 function update_node() {
     let current_count = parseInt($('#num-field').val());
-    if (current_count > 10) {
-        $('#warn_modal').modal('show')
+    if (current_count <= 0) {
+        $('#num-field').val(1)
+        current_count = 1
+    } else if (current_count > 10) {
+        $('#warn-modal-count').modal('show')
         $('#num-field').val(10)
-        return
+        current_count = 10
     }
-    if (current_count <= 0)
-        return
+
     
     if (current_count >= node_statuses.length) {
         add_node_until(node_statuses.length, current_count);
@@ -60,14 +62,19 @@ function pop_node_until(start_node, target_node) {
 function byz_node_check_handler(e) {
     let nodeIdx = parseInt(e.target.id.substring('byz-node'.length))
     if (e.target.checked) {
-        if(byz_num > 10) {
-            $('#warn_modal').modal('show')
+        byz_num++
+        if (byz_num > 8) {
+            $('#warn-modal-byz').modal('show')
+        }
+
+        if (byz_num > 10) {
+            $('#warn-modal-count').modal('show')
             e.target.checked = false;
+            byz_num--
             return
         }
 
         node_statuses[nodeIdx] = true
-        byz_num++
     } else {
         node_statuses[nodeIdx] = false
         byz_num--
@@ -119,10 +126,12 @@ $('#start-btn').on('click', function() {
             $('#reset-btn').prop('disabled', false)
             $('#skip-btn').prop('disabled', false)
             $('#next-btn').prop('disabled', false)
-            $('#prev-btn').prop('disabled', false)
+
+            $('#konsensus-status').text("Konsensus " + response["conclusion"])            
+            update_outer_step_control()
+
             consensus_result = response["nodes"]
             determine_max_iter()
-            $('#konsensus-status').text(response["conclusion"])            
         }
     })
 
@@ -158,6 +167,16 @@ function determine_max_iter() {
     total_rounds = max_step_per_rounds.length;
 }
 
+function update_outer_step_control() {
+    let round_text = `Round: ${cur_round} of ${total_rounds-2} | Step: ${cur_step + 1} of ${max_step_per_rounds[cur_round]}`
+    if (cur_round == 0) {
+        round_text = `Sebelum Simulasi Dimulai`
+    } else if (cur_round == total_rounds - 1) {
+        round_text = `Simulasi Selesai`
+    }
+    $('#outer-step-control').text(round_text)
+}
+
 $('#reset-btn').on('click', function() {
     cur_round = 0
     cur_step = 0
@@ -165,6 +184,7 @@ $('#reset-btn').on('click', function() {
     update_consensus_result(false)
     $('#prev-btn').prop('disabled', true)
     $('#next-btn').prop('disabled', false)
+    update_outer_step_control()
 })
 
 $('#skip-btn').on('click', function() {
@@ -174,6 +194,7 @@ $('#skip-btn').on('click', function() {
     update_consensus_result(true)
     $('#prev-btn').prop('disabled', false)
     $('#next-btn').prop('disabled', true)
+    update_outer_step_control()
 })
 
 $('#next-btn').on('click', function() {
@@ -187,6 +208,7 @@ $('#next-btn').on('click', function() {
         $('#next-btn').prop('disabled', true)
     }
     $('#prev-btn').prop('disabled', false)
+    update_outer_step_control()
 })
 
 $('#prev-btn').on('click', function() {
@@ -205,7 +227,7 @@ $('#prev-btn').on('click', function() {
     }
 
     $('#next-btn').prop('disabled', false)
-
+    update_outer_step_control()
 })
 
 function create_modal_logs(node_id) {
@@ -223,12 +245,23 @@ function create_modal_logs(node_id) {
     let logs = consensus_result[node_id]['logs']
     let idx = 1
 
-    $('#log0content').append(`<h5>Round: ${cur_round + 1} of ${total_rounds} | Step: ${cur_step + 1} of ${max_step_per_rounds[cur_round]}</h5>`)
+    let round_text = `Round: ${cur_round} of ${total_rounds-2} | Step: ${cur_step + 1} of ${max_step_per_rounds[cur_round]}`
+    if (cur_round == 0) {
+        round_text = `Sebelum Simulasi Dimulai`
+    } else if (cur_round == total_rounds - 1) {
+        round_text = `Simulasi Selesai`
+    }
+    $('#log0Step').text(round_text)
     
     for(let round = 0; round < cur_round - 1; round++) {
         for(let step = 0; step <= max_step_per_rounds[round + 1]; step++) {
             if(logs[round] && logs[round][step]) {
-                
+                if (round == 0) {
+                    $('#log0content').append(`<p class="fw-bold">Round ${round+1} | Step 1</p>`)
+                } else {
+                    $('#log0content').append(`<p class="fw-bold">Round ${round+1} | Step ${step}</p>`)
+                }
+
                 logs[round][step].forEach(log => {
                     $('#log0content').append(`<p>${idx}. ${log}</p>`)
                     idx += 1
@@ -241,6 +274,12 @@ function create_modal_logs(node_id) {
     if(logs[cur_round - 1]) {
         for(let step = 0; step <= real_step; step++) {
             if (logs[cur_round - 1] && logs[cur_round - 1][step]) {
+                if (cur_round == 1) {
+                    $('#log0content').append(`<p class="fw-bold">Round ${cur_round} | Step 1</p>`)
+                } else {
+                    $('#log0content').append(`<p class="fw-bold">Round ${cur_round} | Step ${step}</p>`)
+                }
+
                 logs[cur_round - 1][step].forEach(log => {
                     $('#log0content').append(`<p>${idx}. ${log}</p>`)
                     idx += 1
@@ -250,11 +289,11 @@ function create_modal_logs(node_id) {
     }
     if(cur_round == total_rounds - 1) {
         if (!logs["C"]["C"][1]) {
-            $('#log0content').append(`<br><p>Conclusion: ${logs["C"]["C"][0]}</p>`)
+            $('#log0content').append(`<br><p class="fw-bold">Conclusion: ${logs["C"]["C"][0]}</p>`)
         }
         else {
-            $('#log0content').append(`<br><p>Summary: ${logs["C"]["C"][0]}</p>`)
-            $('#log0content').append(`<p>Conclusion: ${logs["C"]["C"][1]}</p>`)
+            $('#log0content').append(`<br><p class="fw-bold">Summary: ${logs["C"]["C"][0]}</p>`)
+            $('#log0content').append(`<p class="fw-bold">Conclusion: ${logs["C"]["C"][1]}</p>`)
         }
     }
 

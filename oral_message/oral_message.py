@@ -35,7 +35,7 @@ class Node:
 
         if self.is_traitor:
             msg = msg.replace(order, "R" if random.choice([0,1]) == 0 else "A")
-            expended_order = "RETREAT" if order[-1] == "A" else "ATTACK"
+            expended_order = "ATTACK" if msg[-1] == "A" else "RETREAT"
         
         self.write_log(f"Sending {expended_order} to Node {target.id}", 0, 0)
         target.receive(msg, self.id, 0, 0, expended_order)
@@ -188,15 +188,22 @@ def serialize(nodes):
         "nodes": {}
     }
 
-    counter = 0
+    a_counter = 0
+    r_counter = 0
     for node in nodes:
         serialized["nodes"][node.id] = node.to_json()
         if node.conclusion == "ATTACK":
-            counter += 1
+            a_counter += 1
         elif node.conclusion == "RETREAT":
-            counter -= 1
+            r_counter += 1
 
-    serialized["conclusion"] = "Tercapai" if counter != 0 else "Tidak Tercapai"
+    conclusion = "Tidak Tercapai"
+    if a_counter > r_counter:
+        conclusion = "Tercapai | ATTACK"
+    elif r_counter > a_counter:
+        conclusion = "Tercapai | RETREAT"
+
+    serialized["conclusion"] = conclusion
     return json.dumps(serialized, indent=4)
 
 

@@ -21,11 +21,14 @@ function update_node() {
     if (current_count <= 0) {
         $('#num-field').val(1)
         current_count = 1
-    } else if (current_count > 10) {
-        $('#warn-modal-count').modal('show')
-        $('#num-field').val(10)
-        current_count = 10
-    }
+    } 
+    
+    // LIMITER
+    // else if (current_count > 10) {
+    //     $('#warn-modal-count').modal('show')
+    //     $('#num-field').val(10)
+    //     current_count = 10
+    // }
 
     
     if (current_count >= node_statuses.length) {
@@ -69,12 +72,13 @@ function byz_node_check_handler(e) {
             $('#warn-modal-byz').modal('show')
         }
 
-        if (byz_num > 10) {
-            $('#warn-modal-count').modal('show')
-            e.target.checked = false;
-            byz_num--
-            return
-        }
+        // LIMITER
+        // if (byz_num > 10) {
+        //     $('#warn-modal-count').modal('show')
+        //     e.target.checked = false;
+        //     byz_num--
+        //     return
+        // }
 
         node_statuses[nodeIdx] = true
     } else {

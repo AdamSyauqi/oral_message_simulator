@@ -1,5 +1,6 @@
 let node_statuses = [false, false, false, false]
 let byz_num = 0;
+let current_count = 4;
 
 $('#num-field').on('change', update_node)
 
@@ -17,18 +18,25 @@ $(window).on('load', function() {
 })
 
 function update_node() {
-    let current_count = parseInt($('#num-field').val());
+    let prev_count = current_count
+    current_count = parseInt($('#num-field').val());
     if (current_count <= 0) {
         $('#num-field').val(1)
         current_count = 1
     } 
+
+    else if (current_count == 10 && byz_num > 2) {
+        $('#warn-modal-byz2').modal('show')
+        $('#num-field').val(prev_count)
+        current_count = prev_count
+    }
     
     // LIMITER
-    // else if (current_count > 10) {
-    //     $('#warn-modal-count').modal('show')
-    //     $('#num-field').val(10)
-    //     current_count = 10
-    // }
+    else if (current_count > 10) {
+        $('#warn-modal-count').modal('show')
+        $('#num-field').val(10)
+        current_count = 10
+    }
 
     
     if (current_count >= node_statuses.length) {
@@ -68,19 +76,22 @@ function byz_node_check_handler(e) {
     let nodeIdx = parseInt(e.target.id.substring('byz-node'.length))
     if (e.target.checked) {
         byz_num++
-        if (byz_num > 8) {
-            $('#warn-modal-byz').modal('show')
+
+        if (current_count == 10 && byz_num > 2) {
+            $('#warn-modal-byz2').modal('show')
+            e.target.checked = false;
+            byz_num--
+            return
         }
 
-        // LIMITER
-        // if (byz_num > 10) {
-        //     $('#warn-modal-count').modal('show')
-        //     e.target.checked = false;
-        //     byz_num--
-        //     return
-        // }
-
+        if (byz_num > 6) {
+            $('#warn-modal-byz1').modal('show')
+            e.target.checked = false;
+            byz_num--
+            return
+        }
         node_statuses[nodeIdx] = true
+        
     } else {
         node_statuses[nodeIdx] = false
         byz_num--

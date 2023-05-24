@@ -14,6 +14,8 @@ class Node:
         self.curr_orders = []
 
         self.logs = dict()
+        self.attack_count = 0
+        self.retreat_count = 0
         self.conclusion = "RETREAT"
 
     def send(self, target, order, round, step):
@@ -44,6 +46,11 @@ class Node:
         self.orders.append(msg)
         self.curr_orders.append(msg)
 
+        if msg[-1] == "A":
+            self.attack_count += 1
+        else:
+            self.retreat_count += 1
+
         sender_node = "Commander" if sender == 0 else f"Node {sender}"
         self.write_log(f"Received {expended_order} from {sender_node}", round, step)
 
@@ -69,6 +76,18 @@ class Node:
             "conclusion": self.conclusion,
             "logs": self.logs
         }
+    
+    def conclude(self, initial_order):       
+        if self.is_commander:
+            self.conclusion = "ATTACK" if initial_order == "A" else "RETREAT"
+        elif self.attack_count > self.retreat_count:
+            self.conclusion = "ATTACK"
+            self.write_log(f"Received {self.attack_count} ATTACK and {self.retreat_count} RETREAT", "C", "C")
+
+        if self.is_traitor:
+            self.conclusion = "is a Byzantine Node"
+        
+        self.write_log(f"{self.conclusion}", "C", "C")
 
 
 
@@ -106,28 +125,8 @@ def om(is_traitor_status, initial_order):
             node.flush_orders()
     
     # Conclude Actions
-    for node in nodes[1:]:
-        attack = 0
-        retreat = 0
-        for order in node.orders:
-            if order[-1] == "A":
-                attack += 1
-            else:
-                retreat += 1
-
-        conclusion = "ATTACK" if attack > retreat else "RETREAT"
-        if node.is_traitor:
-            conclusion = "is a Byzantine Node"
-        node.conclusion = conclusion
-
-        node.write_log(f"Received {attack} ATTACK and {retreat} RETREAT", "C", "C")
-        node.write_log(f"{conclusion}", "C", "C")
-    
-    if commander.is_traitor:
-        commander.conclusion = "is a Byzantine Node"
-    else:
-        commander.conclusion = "ATTACK" if initial_order == "A" else "RETREAT"
-    commander.write_log(f"{commander.conclusion}", "C", "C")
+    for node in nodes:
+        node.conclude(initial_order)
 
     return nodes
 
